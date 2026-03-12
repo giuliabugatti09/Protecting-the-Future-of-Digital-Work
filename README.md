@@ -1,144 +1,56 @@
-# 🛡️🤖 Protecting the Future of Digital Work
+# 🛡️ AI & The Future of Work: A Predictive & Cluster Analysis
 
-**A Machine Learning pipeline analyzing the impact of AI on global occupations through clustering and predictive modeling.**
+> **Strategic Machine Learning pipeline** investigating the impact of AI on global job markets (2024–2030). This project goes beyond simple prediction to uncover the underlying structures of automation risk.
 
-📌 **Global Solution 2025.2 – Machine Learning & Modeling**
-
----
-
-## 📋 Overview
-
-This project leverages **Machine Learning** to analyze global job market data (2024–2030), aiming to understand and predict the impact of **Artificial Intelligence on occupations**.
-
-Rather than relying solely on prediction, the solution emphasizes **exploratory analysis and clustering**, uncovering hidden patterns, risk profiles, and career trajectories in the evolving digital workforce.
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-Latest-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Interface-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 
 ---
 
-## 🚀 Project Pipeline
-
-The solution was developed in **four strategic stages**:
-
----
-
-### 1️⃣ Exploratory Data Analysis (EDA) 📊
-
-We explored relationships between key market variables such as:
-
-* Salary
-* Experience
-* Location
-* Automation Risk
-
-🔍 **Key Discovery**
-A near-zero correlation (~0.01) was found between numerical features and automation risk, **challenging the assumption** that higher salaries automatically imply lower automation risk.
+## 📋 Executive Overview
+As AI reshapes the global economy, understanding which roles are most vulnerable is critical. This project analyzes a dataset of global occupations through a dual lens: **Unsupervised Learning** (to find hidden risk groups) and **Supervised Learning** (to test the predictability of AI impact).
 
 ---
 
-### 2️⃣ Unsupervised Learning (Clustering) 🧩
+## 🚀 Strategic Pipeline
 
-After confirming that salary-based prediction was ineffective, we applied **K-Means Clustering (k = 10)** to group professions by similarity.
+### 1. Exploratory Data Analysis (EDA) 📊
+* **Counter-Intuitive Discovery:** We identified a **near-zero correlation (~0.01)** between salary/experience and automation risk. 
+* **The "Safety Myth":** Contrary to popular belief, high-paying roles are not inherently safer from AI disruption; the nature of tasks (routine vs. strategic) is the true driver.
 
-✅ **Result**
-Distinct professional profiles emerged, including:
 
-* **Resilient Strategists** → Low risk, creative and strategic roles
-* **Vulnerable Roles** → High risk, routine-based occupations
 
-This step proved to be one of the most insightful parts of the project.
+### 2. Unsupervised Learning: Defining Risk Profiles 🧩
+Using **K-Means Clustering (k=10)**, we moved beyond job titles to identify behavioral clusters:
+* **Resilient Strategists:** High-creativity, low-automation risk profiles.
+* **Transitioning Tech Profiles:** High-salary roles that face significant automation due to routine-based technical tasks.
+* **Vulnerable Operational Roles:** High-risk, high-routine clusters requiring urgent reskilling.
 
----
 
-### 3️⃣ Supervised Learning (Prediction) 🤖
 
-A **Random Forest Classifier**, optimized with **GridSearchCV**, was trained to predict the **AI Impact Level**.
+### 3. Supervised Learning: The Prediction Challenge 🤖
+We implemented a **Random Forest Classifier** (optimized via GridSearchCV).
+* **The Result:** ~33% Accuracy.
+* **Technical Diagnosis:** The low accuracy empirically proves that traditional demographic/financial metrics are **insufficient predictors** for AI impact. This finding shifts the focus toward qualitative task-analysis rather than quantitative job-metrics.
 
-📈 **Outcome**
-
-* Test Accuracy: ~33%
-
-🧪 **Diagnosis**
-Since the target variable has three classes (High, Moderate, Low), this accuracy is equivalent to random guessing.
-This result empirically validated the EDA findings: **the available features lack sufficient predictive signal** for this target.
+### 4. Ethical Deployment (Streamlit) 🌐
+A web interface was developed to visualize these risks, featuring a **Transparency & Ethics Layer**. It informs users that AI impact is non-linear and cannot be predicted by salary alone.
 
 ---
 
-### 4️⃣ Interactive Interface (Streamlit) 🌐
-
-A **Streamlit web application** allows users to:
-
-* Input job characteristics
-* Receive an AI impact analysis
-
-⚠️ The interface includes a **clear transparency warning**, highlighting model limitations to promote **ethical and responsible use**.
+## 🧠 Key Strategic Insights
+1. **Universal Risk:** Automation impact is sector-agnostic, affecting Healthcare and Transportation with similar intensity.
+2. **Reskilling Urgency:** The identification of "Transitioning Profiles" highlights where corporate training budget should be prioritized.
+3. **Data Integrity:** Responsible AI means acknowledging when data lacks predictive power—transparency over "perfect" but false metrics.
 
 ---
 
-## 📂 Project Structure
-
-```
-├── app.py                   # Streamlit Application (Main Interface)
-├── analysis_notebook.ipynb  # EDA, K-Means Clustering & Model Training
-├── requirements.txt         # Project Dependencies
-├── modelo_final.pkl         # Trained Random Forest Model
-├── preprocessor.pkl         # Data Preprocessing Pipeline
-├── label_encoder.pkl        # Target Variable Encoder
-└── README.md                # Project Documentation
-```
-
----
-
-## ⚙️ Installation & Usage
-
-### 🔹 Clone the repository (or download the files)
-
-Make sure all `.pkl` files and `app.py` are located in the same directory.
-
-### 🔹 Install dependencies
-
+## ⚙️ Installation & Deployment
 ```bash
+# Clone and install
 pip install pandas numpy scikit-learn streamlit joblib matplotlib seaborn
-```
 
-### 🔹 Run the application
-
-```bash
+# Launch the dashboard
 streamlit run app.py
-```
-
----
-
-## 🧠 Key Insights & Conclusions
-
-* **Risk Is Generalized**
-  Automation impacts both **Transportation** and **Healthcare** sectors at similar levels.
-
-* **The Plot Twist**
-  Salary and experience are **not reliable predictors** of AI safety.
-  The **nature of the task** (routine vs. creative) plays a far more critical role.
-
-* **Cluster Profiles Matter**
-  The most valuable insights came from clustering, especially identifying
-  **“Transitioning Profiles”** (High Tech, High Risk), which demand **urgent reskilling strategies**.
-
----
-
-## ⚠️ Ethical & Transparency Note
-
-This tool uses **public job market data** strictly for educational purposes.
-
-During validation, we identified that the dataset has **low predictive power** for the target variable *“AI Impact Level”*.
-As a result:
-
-* Predictions are **demonstrative**, not prescriptive
-* The application should **not be used as the sole basis for career decisions**
-
-Transparency and responsible AI usage were core design principles of this project.
-
----
-
-## 👨‍💻 Authors
-
-**Global Solution Team – 1TIAP**
-
-✍️ Giulia Bugatti
 
