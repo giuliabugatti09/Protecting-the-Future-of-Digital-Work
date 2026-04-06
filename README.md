@@ -59,7 +59,7 @@ We implemented an **XGBoost Classifier** optimized via **GridSearchCV**.
 ## ⚙️ Installation & Deployment
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/giuliabugatti09/AI-Impact-Professions.git](https://github.com/giuliabugatti09/AI-Impact-Professions.git)
+   git clone [https://github.com/giuliabugatti09/Protecting-the-Future-of-Digital-Work.git]
    ```
 2. **Install dependencies:**
    ```bash
@@ -72,4 +72,3 @@ We implemented an **XGBoost Classifier** optimized via **GridSearchCV**.
 
 ---
 **Developed by Giulia Bugatti** *Artificial Intelligence Student at FIAP* | Expected Graduation: **Dec 2026**
-```
