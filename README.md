@@ -46,8 +46,12 @@ We implemented an **XGBoost Classifier** optimized via **GridSearchCV**.
 │   └── label_encoder.pkl     # Target class decoder
 ├── notebooks/
 │   └── ai_impact_analysis.ipynb  # Full EDA and Clustering logic
+├── data/
+│   └── ai_job_trends_dataset (1).csv # Dataset
 ├── app.py                    # Streamlit Interactive Dashboard
 └── requirements.txt          # Project dependencies
+└── LICENSE         # License Project
+
 ```
 
 ---
