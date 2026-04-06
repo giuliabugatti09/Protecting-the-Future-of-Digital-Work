@@ -1,210 +1,123 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import numpy as np
+import os
 
-# ===============================================
-# 1. CARREGAMENTO DOS ARTEFATOS
-# ===============================================
-try:
-    # Carrega os arquivos gerados pelo notebook
-    model = joblib.load('modelo_final.pkl')
-    preprocessor = joblib.load('preprocessor.pkl')
-    le = joblib.load('label_encoder.pkl')
-    
-    # Recupera os nomes das features esperadas pelo preprocessor
-    numerical_features = preprocessor.transformers_[0][2] 
-    categorical_features = preprocessor.transformers_[1][2]
-    
-except FileNotFoundError:
-    st.error("🚨 Erro Crítico: Arquivos .pkl não encontrados.")
-    st.warning("Certifique-se de que 'modelo_final.pkl', 'preprocessor.pkl' e 'label_encoder.pkl' estão na mesma pasta que este script.")
-    st.stop()
-except Exception as e:
-    st.error(f"Erro ao carregar os arquivos: {e}")
-    st.stop()
-
-# ===============================================
-# 2. CONFIGURAÇÃO DA PÁGINA
-# ===============================================
+# --- PAGE CONFIG ---
 st.set_page_config(
     page_title="AI Impact Predictor",
     page_icon="🤖",
     layout="wide"
 )
 
-st.title("🤖 Previsor de Impacto da IA nas Profissões")
+# --- LOAD ASSETS ---
+@st.cache_resource
+def load_assets():
+    # Definindo os caminhos corretos conforme sua imagem
+    model_path = os.path.join('models', 'ai_impact_model.pkl')
+    encoder_path = os.path.join('models', 'label_encoder.pkl')
+
+    # Carrega o Pipeline completo (Preprocessor + XGBoost)
+    model_pipeline = joblib.load(model_path)
+    
+    # Carrega o Label Encoder
+    le = joblib.load(encoder_path)
+    
+    return model_pipeline, le
+
+# Agora chamamos apenas os dois
+model, le = load_assets()
+# --- HEADER ---
+st.title("🤖 AI Occupational Impact Predictor")
 st.markdown("""
-Esta aplicação utiliza um modelo de Machine Learning para prever o nível de impacto da Inteligência Artificial em diferentes ocupações.
-***
+This application uses a Machine Learning pipeline to forecast the intensity of Artificial Intelligence impact across different professions based on market data (2024-2030).
+---
 """)
 
-# ===============================================
-# 3. DEFINIÇÃO DE OPÇÕES (VALIDADAS PELO DATASET)
-# ===============================================
-options_industry = [
-    'Education', 'Entertainment', 'Finance', 'Healthcare', 
-    'IT', 'Manufacturing', 'Retail', 'Transportation'
-]
+# --- INPUT OPTIONS (VALIDATED BY DATASET) ---
+options_industry = ['Education', 'Entertainment', 'Finance', 'Healthcare', 'IT', 'Manufacturing', 'Retail', 'Transportation']
+options_job_status = ['Decreasing', 'Increasing', 'Stable']
+options_education = ["Bachelor's", "Master's", "PhD", "High School", "Associate's"]
+options_location = ['Australia', 'Canada', 'Germany', 'India', 'UK', 'USA']
 
-options_job_status = [
-    'Decreasing', 'Increasing'
-]
-
-options_education = [
-    'Associate Degree', 'Bachelor’s Degree', 'High School', 'Master’s Degree', 'PhD'
-]
-
-options_location = [
-    'Australia', 'Brazil', 'Canada', 'China', 'Germany', 'India', 'UK', 'USA'
-]
-
-# ===============================================
-# 4. FORMULÁRIO DE ENTRADA
-# ===============================================
-
+# --- INPUT FORM ---
 col1, col2 = st.columns(2)
 
 with col1:
-    st.header("📊 Características Quantitativas")
+    st.subheader("📊 Quantitative Features")
     
-    # Adicionei o argumento 'key' em todos os inputs para evitar o erro de ID duplicado
-    median_salary = st.number_input(
-        label=numerical_features[0],
-        min_value=0, 
-        value=50000,
-        step=1000,
-        key="salary_input"
-    )
-    experience = st.number_input(
-        label=numerical_features[1],
-        min_value=0, 
-        value=5,
-        key="experience_input"
-    )
-    job_openings_2024 = st.number_input(
-        label=numerical_features[2],
-        min_value=0, 
-        value=1000,
-        key="openings24_input"
-    )
-    projected_openings_2030 = st.number_input(
-        label=numerical_features[3],
-        min_value=0, 
-        value=1200,
-        key="openings30_input"
-    )
-    remote_ratio = st.slider(
-        label=numerical_features[4],
-        min_value=0.0, 
-        max_value=100.0, 
-        value=20.0, 
-        step=0.1,
-        key="remote_input"
-    )
-    gender_diversity = st.slider(
-        label=numerical_features[5],
-        min_value=0.0, 
-        max_value=100.0, 
-        value=40.0, 
-        step=0.1,
-        key="gender_input"
-    )
-    automation_risk = st.slider(
-        label=numerical_features[6],
-        min_value=0.0, 
-        max_value=100.0, 
-        value=50.0, 
-        step=0.1,
-        key="risk_input"
-    )
+    salary = st.number_input("Median Salary (USD)", min_value=0, value=70000, step=5000)
+    experience = st.slider("Experience Required (Years)", 0, 30, 5)
+    openings_2024 = st.number_input("Job Openings (2024)", min_value=0, value=5000)
+    openings_2030 = st.number_input("Projected Openings (2030)", min_value=0, value=5500)
+    remote_ratio = st.slider("Remote Work Ratio (%)", 0, 100, 40)
+    gender_div = st.slider("Gender Diversity (%)", 0, 100, 50)
+    auto_risk = st.slider("Automation Risk (%)", 0, 100, 50)
 
 with col2:
-    st.header("🏷️ Características Categóricas")
+    st.subheader("🏷️ Categorical Features")
     
-    industry = st.selectbox(
-        label=categorical_features[0],
-        options=options_industry,
-        key="industry_input"
-    )
-    job_status = st.selectbox(
-        label=categorical_features[1],
-        options=options_job_status,
-        key="status_input"
-    )
-    education = st.selectbox(
-        label=categorical_features[2],
-        options=options_education,
-        key="education_input"
-    )
-    location = st.selectbox(
-        label=categorical_features[3],
-        options=options_location,
-        key="location_input"
-    )
+    industry = st.selectbox("Industry Sector", options_industry)
+    status = st.selectbox("Market Status", options_job_status)
+    education = st.selectbox("Required Education Level", options_education)
+    location = st.selectbox("Geographical Location", options_location)
 
 st.markdown("---")
 
-# ===============================================
-# 5. BOTÃO DE PREVISÃO E LÓGICA
-# ===============================================
-
-if st.button("🔍 Prever Impacto da IA", type="primary", key="predict_btn"):
+# --- PREDICTION LOGIC ---
+if st.button("🔍 Run Impact Analysis", type="primary"):
     
-    # Coletar os dados em um dicionário
-    input_data = {
-        numerical_features[0]: [median_salary],
-        numerical_features[1]: [experience],
-        numerical_features[2]: [job_openings_2024],
-        numerical_features[3]: [projected_openings_2030],
-        numerical_features[4]: [remote_ratio],
-        numerical_features[5]: [gender_diversity],
-        numerical_features[6]: [automation_risk],
-        
-        categorical_features[0]: [industry],
-        categorical_features[1]: [job_status],
-        categorical_features[2]: [education],
-        categorical_features[3]: [location],
-    }
-    
-    # Criar DataFrame
-    input_df = pd.DataFrame(input_data)
+    # Building the input DataFrame with exact feature names from the notebook
+    input_df = pd.DataFrame({
+        'Industry': [industry],
+        'Median Salary (USD)': [salary],
+        'Experience Required (Years)': [experience],
+        'Required Education': [education],
+        'Job Openings (2024)': [openings_2024],
+        'Projected Openings (2030)': [openings_2030],
+        'Remote Work Ratio (%)': [remote_ratio],
+        'Automation Risk (%)': [auto_risk],
+        'Location': [location],
+        'Gender Diversity (%)': [gender_div],
+        'Job Status': [status]
+    })
     
     try:
-        # 1. Processar os dados
-        input_processed = preprocessor.transform(input_df)
+        # 1. Pipeline transformation & Prediction
+        # Since the model saved is the full Pipeline, it handles scaling/encoding internally
+        prediction_encoded = model.predict(input_df)
+        result = le.inverse_transform(prediction_encoded)[0]
         
-        # 2. Fazer a previsão
-        prediction_encoded = model.predict(input_processed)
-        
-        # 3. Decodificar a previsão
-        prediction_text = le.inverse_transform(prediction_encoded)
-        result = prediction_text[0]
-        
-        # 4. Exibir Resultado
-        st.subheader("Resultado da Análise:")
+        # 2. Display Result
+        st.subheader("Analysis Result:")
         
         if result == 'High':
-            st.error(f"🚨 Nível de Impacto Previsto: **{result}**")
+            st.error(f"### AI Impact Level: **{result}**")
+            st.warning("⚠️ High exposure to automation. Reskilling and AI-adaptation are recommended.")
         elif result == 'Moderate':
-            st.warning(f"⚠️ Nível de Impacto Previsto: **{result}**")
+            st.warning(f"### AI Impact Level: **{result}**")
+            st.info("📈 AI will likely augment productivity. Focus on integrating AI tools into daily workflows.")
         else:
-            st.success(f"✅ Nível de Impacto Previsto: **{result}**")
+            st.success(f"### AI Impact Level: **{result}**")
+            st.write("✅ Low direct impact. This role relies heavily on human-centric or strategic skills.")
             
-        # 5. AVISO ÉTICO E TÉCNICO
+        # 3. TRANSPARENCY & ETHICS NOTE
         st.markdown("---")
         st.info(
             """
-            **ℹ️ Nota de Transparência e Ética:**
+            **ℹ️ Transparency & Ethics Note:**
             
-            Este modelo foi treinado utilizando dados públicos de mercado. Durante a fase de validação técnica, 
-            observou-se que as variáveis disponíveis (Salário, Localização, Experiência) possuem baixa correlação 
-            linear com o impacto da IA, resultando em uma acurácia preditiva limitada (~33%).
+            This model was trained on a specific 2024-2030 job market dataset. Technical validation revealed that 
+            demographic variables (Salary, Location, Experience) have low linear correlation with AI impact.
             
-            Portanto, esta ferramenta deve ser utilizada para fins educacionais e de demonstração técnica do pipeline 
-            de Machine Learning, e **não como base única para decisões reais de carreira**.
+            This tool is for **educational and demonstration purposes only**, showcasing a Machine Learning 
+            pipeline (EDA -> Clustering -> Classification). It should not be the sole basis for real-world career decisions.
             """
         )
 
     except Exception as e:
-        st.error(f"Ocorreu um erro durante o processamento: {e}")
+        st.error(f"An error occurred during processing: {e}")
+
+# --- FOOTER ---
+st.sidebar.markdown("---")
+st.sidebar.caption("Developed by Giulia Bugatti | FIAP AI")
